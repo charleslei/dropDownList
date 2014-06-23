@@ -109,7 +109,11 @@ $(function(){
             var listLen = itemList.length;
             var idx = me.curIdx;
 
-            idx = dir > 0 ? idx + 1 : idx -1;
+            if(dir > 0){
+                (++idx > listLen - 1) && (idx = 0);
+            }else if(dir < 0){
+                (--idx < 0) && (idx = listLen -1);
+            }
 
             idx = idx > listLen ? listLen : idx;
             me.curIdx = idx;
@@ -137,12 +141,11 @@ $(function(){
         _scrollTo: function(val){
             var me = this;
 
-            //判断列表是否显示,
+            //判断列表是否显示,如果当前未显示，那么先显示列表框，然后结束该操作；
             if(!me.shown) {
                 me._show();
                 return;
             }
-
 
             var idx = me.curIdx;
             var idxDelta;
@@ -158,22 +161,17 @@ $(function(){
             if(val > 0){
                 if((delta = (idx + 1)*curH - scrollTop - prtH) > 0){
                     top = scrollTop + delta + 2; //dom的border是2px
-                    idx += 1;
                 } else if((delta = (idx + 1) * curH - scrollTop) < 0) {
                     top = 0;
-                    idx = 0;
                 }
             } else {
                 if((delta = (idx + 1)*curH - scrollTop - prtH) > 0){
                     top = scrollTop + delta + 2; //dom的border是2px
-                    idx = 0;
                 } else if((delta = idx * curH - scrollTop) < 0) {
                     top = scrollTop + delta;
-                    idx = me.itemList.length;
                 }
             }
             dom.scrollTop(top);
-            me.curIdx = idx;
             me._setCurrent(val);
         },
 
