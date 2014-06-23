@@ -35,18 +35,20 @@ $(function(){
                 e.preventDefault();
             }).bind('keydown', function(e){
                 var code = e.keyCode;
-                if(code === 37 || code === 38){ //arrow up and left
+                if(code === 38){ //arrow up
                     me._scrollTo(-1);
-                } else if(code === 39 || code === 40){ //arrow down and right
+                    e.preventDefault();
+                } else if(code === 40){ //arrow down
                     me._scrollTo(1);
+                    e.preventDefault();
                 } else if(code === 13){ //press enter
                     me._setValue();
+                    e.preventDefault();
                 } else if(code === 33){ //page up
                 } else if(code === 34){  //page down
                 } else if(code === 8){ //backspace
                     //do nothing;
                 }
-                e.preventDefault();
             });
 
             me.dom.delegate('.dropdownlist_item', 'mousedown', function(e){
