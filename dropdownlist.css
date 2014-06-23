@@ -1,0 +1,4 @@
+.dropdownlist{position: absolute; background: #EEE; display: none}
+.dropdownlist ul{list-style: none;margin:0;padding:0}
+.dropdownlist .dropdownlist_item{line-height: 30px; height: 30px; overflow: hidden; cursor: pointer;}
+.dropdownlist .dropdownlist_item.active{background-color:#4778da}

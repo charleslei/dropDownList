@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style type="text/css">
+         body{overflow: hidden;}
+        .prt{width: 100%; background: white;font-size:16px;}
+        .content{
+            width: 990px;
+            margin: 0 auto;
+            border:15px solid #aaf;
+            min-height: 125px;
+            margin-top: 70px;
+            height:220px;
+            padding:20px;
+        }
+
+        .content .dropdown{
+            padding:10px 20px;
+            width:200px;
+            height:30px;
+            background:green;
+            border:5px solid rgb(245,161,161);
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../dropdownlist.css">
+</head>
+<body>
+    <div class="prt">
+        <div class='content'>
+            <input type="text" class="dropdown" autocomplete=off id="dropdown">
+        </div>
+    </div>
+
+    <script type="text/javascript" src="./jquery-2.1.0.min.js"></script>
+    <script src="../dropdownlist.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(function(){
+            $('.dropdown').DropDownList(['你是我的小呀小苹果1', '你是我的小呀小苹果2', '你是我的小呀小苹果3', '你是我的小呀小苹果4', '你是我的小呀小苹果5', '你是我的小呀小苹果6', '你是我的小呀小苹果7']);
+        })
+    
+    </script>
+
+</body>
+</html>
