@@ -20,7 +20,7 @@ $(function(){
         _init: function(){
             var me = this;
             me._initHTML();
-            me._drawHTML();
+            me._drawList();
             me._initEvt();
         },
 
@@ -36,13 +36,13 @@ $(function(){
             }).bind('keydown', function(e){
                 var code = e.keyCode;
                 if(code === 38){ //arrow up
-                    me._scrollTo(-1);
+                    me._next(-1);
                     e.preventDefault();
                 } else if(code === 40){ //arrow down
-                    me._scrollTo(1);
+                    me._next(1);
                     e.preventDefault();
                 } else if(code === 13){ //press enter
-                    me._setValue();
+                    me._setSelectedValue();
                     e.preventDefault();
                 } else if(code === 33){ //page up
                 } else if(code === 34){  //page down
@@ -53,12 +53,10 @@ $(function(){
 
             me.dom.delegate('.dropdownlist_item', 'mousedown', function(e){
                 var $ele = $(e.target);
-                me._setValue($ele);
+                me._setSelectedValue($ele);
             }).delegate('.dropdownlist_item', 'mouseover', function(e){
                 var self = $(e.target);
-                var activeClass = me.config.activeClass;
-                me.itemList.removeClass(activeClass);
-                self.addClass(activeClass);
+                me._setCurrentStyle(self);
             })
         },
 
@@ -74,7 +72,7 @@ $(function(){
             prt.append(me.dom);
         },
 
-        _drawHTML: function(){
+        _drawList: function(){
             var me = this;
             var dom = me.dom;
             var data = me.oriData;
@@ -92,7 +90,7 @@ $(function(){
             me.curRect = {top: list.eq(0).offset().top, h: list.eq(0).outerHeight()};
         },
 
-        _setValue: function(item){
+        _setSelectedValue: function(item){
             var me = this;
             var tgt = me.config.tgt;
             if(!item){
@@ -105,7 +103,7 @@ $(function(){
             me._hide();
         },
 
-        _setCurrent: function(dir){
+        _setCurrentIdx: function(dir){
             var me = this;
             var itemList = me.itemList;
             var listLen = itemList.length;
@@ -119,16 +117,41 @@ $(function(){
 
             idx = idx > listLen ? listLen : idx;
             me.curIdx = idx;
+
+            me._setCurrentStyle();
+        },
+
+        _setCurrentStyle: function(item){
+            var me = this;
             var actClass = me.config.activeClass;
-            itemList.removeClass(actClass).eq(idx).addClass(actClass);
-            console.log('setCurrent         ' + idx);
+            var idx = me.curIdx;
+            var list = me.itemList;
+            list.removeClass(actClass);
+            if(item && item.length > 0 ){
+                item.addClass(actClass);
+            }else{
+                list.eq(idx).addClass(actClass);
+            }
+        },
+
+        _next: function(dir){
+            var me = this;
+
+            //判断列表是否显示,如果当前未显示，那么先显示列表框，然后结束该操作；
+            if(!me.shown) {
+                me._show();
+                return;
+            }
+
+            me._scrollTo(dir);
+            me._setCurrentIdx(dir);
         },
 
         _show: function(){
             var me = this;
 
             if(me.shown) return ;
-            me._setCurrent();
+            me._setCurrentStyle();
             me.dom.show();
             me.shown = true;
         },
@@ -140,14 +163,9 @@ $(function(){
             me.shown = false;
         },
 
+        /*当下拉列表出现滚动条时,该方法可以实现同一方向上的循环滚动;*/
         _scrollTo: function(val){
             var me = this;
-
-            //判断列表是否显示,如果当前未显示，那么先显示列表框，然后结束该操作；
-            if(!me.shown) {
-                me._show();
-                return;
-            }
 
             var idx = me.curIdx;
             var idxDelta;
@@ -174,7 +192,6 @@ $(function(){
                 }
             }
             dom.scrollTop(top);
-            me._setCurrent(val);
         },
 
     }
