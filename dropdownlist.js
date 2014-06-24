@@ -3,49 +3,60 @@ if (typeof QNR == "undefined") {
 }
 
 $(function() {
-    CC = function(data, args) {
+    DropDownList = function(data, args) {
         var me = this;
         var config = {
             activeClass: 'active',
             max: 5,
 
-            onSelected: function(){}
+            onSelected: function() {}
         }
         me.oriData = data;
         me.config = $.extend(config, args);
         me.itemList = '';
         me.curIdx = 0;
 
-        me._init();
-    }
+        DropDownList._init(me);
+    };
 
-    CC.prototype = {
-        _init: function() {
-            var me = this;
-            me._initHTML();
-            me._drawList();
-            me._initEvt();
+    var AA = {
+        _getObjectType: function(obj) {
+            var type = Object.prototype.toString.apply(obj);
+            if (type === '[object Object]') {
+                return 'object';
+            } else if (type === '[object Number]') {
+                return 'number';
+            } else if (type === '[object Array]') {
+                return 'array';
+            } else {
+                return 'object';
+            }
         },
 
-        _initEvt: function() {
+        _init: function(me) {
+            DropDownList._initHTML(me);
+            DropDownList._drawList(me);
+            DropDownList._initEvt(me);
+        },
+
+        _initEvt: function(me) {
             //单击输入框或者获取焦点时;
-            var me = this;
             me.config.tgt.bind('click focusin', function(e) {
-                me._show();
+                DropDownList._show(me);
                 e.preventDefault();
             }).bind('blur focusout', function(e) {
-                me._hide();
+                DropDownList._hide(me);
                 e.preventDefault();
             }).bind('keydown', function(e) {
                 var code = e.keyCode;
                 if (code === 38) { //arrow up
-                    me._next(-1);
+                    DropDownList._next(me, -1);
                     e.preventDefault();
                 } else if (code === 40) { //arrow down
-                    me._next(1);
+                    DropDownList._next(me, 1);
                     e.preventDefault();
                 } else if (code === 13) { //press enter
-                    me._setSelectedValue();
+                    DropDownList._setSelectedValue(me);
                     e.preventDefault();
                 } else if (code === 33) { //page up
                 } else if (code === 34) { //page down
@@ -56,21 +67,20 @@ $(function() {
 
             me.dom.delegate('.dropdownlist_item', 'mousedown', function(e) {
                 var $ele = $(e.target);
-                me._setSelectedValue($ele);
+                DropDownList._setSelectedValue(me, $ele);
             }).delegate('.dropdownlist_item', 'mouseover', function(e) {
                 var self = $(e.target);
-                me._setStyle(self);
+                DropDownList._setStyle(me, self);
             })
 
 
             //用户注册事件
-            me.dom.bind('selected', function(){
+            me.dom.bind('selected', function() {
                 me.config.onSelected.apply(me);
             });
         },
 
-        _initHTML: function() {
-            var me = this;
+        _initHTML: function(me) {
             var tgt = me.config.tgt;
             var _html = '<div class="dropdownlist"><ul></ul></div>';
 
@@ -83,8 +93,7 @@ $(function() {
             prt.append(me.dom);
         },
 
-        _drawList: function() {
-            var me = this;
+        _drawList: function(me) {
             var dom = me.dom;
             var data = me.oriData;
             var str = '';
@@ -107,17 +116,14 @@ $(function() {
                 top: list.eq(0).offset().top,
                 h: list.eq(0).outerHeight()
             };
-
-            //me._setIdx();
         },
 
-        _setSelectedValue: function(item) {
-            var me = this;
+        _setSelectedValue: function(me, item) {
             var tgt = me.config.tgt;
             var list = me.itemList;
             var idx = '';
             if (!item) {
-                idx = me._getNextIdxByCls();
+                idx = DropDownList._getNextIdxByCls(me);
                 item = list.eq(idx);
 
             } else {
@@ -129,19 +135,17 @@ $(function() {
             tgt.val(val);
 
             me.dom.trigger('selected');
-            me._hide();
+            DropDownList._hide(me);
         },
 
-        _setIdx: function(dir) {
-            var me = this;
-            var idx = me._getNextIdxByCls(dir);
+        _setIdx: function(me, dir) {
+            var idx = me._getNextIdxByCls(me, dir);
             me.curIdx = idx;
 
-            me._setStyle(idx);
+            me._setStyle(me, idx);
         },
 
-        _getNextIdxByCls: function(dir) {
-            var me = this;
+        _getNextIdxByCls: function(me, dir) {
             var itemList = me.itemList;
             var listLen = itemList.length;
             var actClass = me.config.activeClass;
@@ -158,65 +162,56 @@ $(function() {
         },
 
         /*当列表项修改时,当前的index会超出列表长度,故在这里判断一下 */
-        _getIdx: function() {
-            var me = this;
+        _getIdx: function(me) {
             var idx = me.curIdx;
             var list = me.itemList;
             var listLen = me.itemList.length;
             return (idx > listLen - 1) ? listLen - 1 : idx;
         },
 
-        _setStyle: function(item) { //参数支持:jquery对象, 数字, 或空(当前的index)
-            var me = this;
+        _setStyle: function(me, item) { //参数支持:jquery对象, 数字, 或空(当前的index)
             var actClass = me.config.activeClass;
             var list = me.itemList;
-            var type = me._getObjectType(item);
+            var type = DropDownList._getObjectType(item);
             list.removeClass(actClass);
             if (item && item.length > 0 && type === 'object') { //jquery object
                 item.addClass(actClass);
             } else if (type === 'number') { //number
                 list.eq(item).addClass(actClass);
             } else {
-                var idx = me._getIdx();
+                var idx = DropDownList._getIdx(me);
                 list.eq(idx).addClass(actClass);
             }
         },
 
         /*设置下一个高亮的想,此操作不会对curIdx属性直接进行修改,而是间接性的;*/
-        _next: function(dir) {
-            var me = this;
-
+        _next: function(me, dir) {
             //判断列表是否显示,如果当前未显示，那么先显示列表框，然后结束该操作；
             if (!me.shown) {
-                me._show();
+                DropDownList._show(me);
                 return;
             }
 
-            me._scrollTo(dir);
-            me._setStyle(me._getNextIdxByCls(dir));
+            DropDownList._scrollTo(me, dir);
+            DropDownList._setStyle(me, DropDownList._getNextIdxByCls(me, dir));
         },
 
-        _show: function() {
-            var me = this;
-
+        _show: function(me) {
             if (me.shown) return;
-            me._setStyle();
+            DropDownList._setStyle(me);
             me.dom.show();
             me.shown = true;
         },
 
-        _hide: function(obj) {
-            var me = this;
+        _hide: function(me) {
             me.itemList.removeClass(me.config.activeClass);
             me.dom.hide();
             me.shown = false;
         },
 
         /*当下拉列表出现滚动条时,该方法可以实现同一方向上的循环滚动;*/
-        _scrollTo: function(val) {
-            var me = this;
-
-            var idx = me._getIdx();
+        _scrollTo: function(me, val) {
+            var idx = DropDownList._getIdx(me);
             var idxDelta;
             var curH = me.curRect.h;
             var curTop = me.curRect.top - idx * curH;
@@ -241,28 +236,16 @@ $(function() {
                 }
             }
             dom.scrollTop(top);
-        },
+        }
+    };
 
-        _getObjectType: function(obj) {
-            var type = Object.prototype.toString.apply(obj);
-            if (type === '[object Object]') {
-                return 'object';
-            } else if (type === '[object Number]') {
-                return 'number';
-            } else if (type === '[object Array]') {
-                return 'array';
-            } else {
-                return 'object';
-            }
-        },
-
-        /*============================
-         *public function
-         * */
+    $.extend(DropDownList, AA);
+    DropDownList.prototype = {
+        //public function
         setList: function(data) {
             var me = this;
             me.oriData = data;
-            me._drawList();
+            DropDownList._drawList(me);
         }
     }
 
@@ -275,7 +258,7 @@ $(function() {
                 var obj = $ele.data(objStr);
                 if (!data || Object.prototype.toString.apply(data) != '[object Array]') return;
                 if (!obj) {
-                    var dropDownList = new CC(data, $.extend({}, args, {
+                    var dropDownList = new DropDownList(data, $.extend({}, args, {
                         tgt: $ele
                     }));
                     $ele.data(objStr, dropDownList);

@@ -32,6 +32,9 @@
         <div class='content'>
             <input type="text" class="dropdown" autocomplete=off id="dropdown">
         </div>
+        <div class='content'>
+            <input type="text" class="dropdown" autocomplete=off id="dropdown">
+        </div>
         <div class='changeList'>更改列表内容</div>
     </div>
 
@@ -43,7 +46,7 @@
                     console.log(this);
                     }});
             $('.changeList').click(function(e){
-                var dropDownList = $('.dropdown').data('DROPDOWNLIST');
+                var dropDownList = $('#dropdown').data('DROPDOWNLIST');
                 dropDownList.setList(['无敌的喵星人1','无敌的喵星人2','无敌的喵星人3','无敌的喵星人4']);
                 //dropDownList.setList(['无敌的喵星人1','无敌的喵星人2','无敌的喵星人3','无敌的喵星人4','无敌的喵星人5','无敌的喵星人6','无敌的喵星人7','无敌的喵星人8','无敌的喵星人9']);
                 e.preventDefault();
