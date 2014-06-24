@@ -101,11 +101,17 @@ $(function() {
         _setSelectedValue: function(item) {
             var me = this;
             var tgt = me.config.tgt;
+            var list = me.itemList;
+            var idx = '';
             if (!item) {
-                var idx = me.curIdx;
-                var list = me.itemList;
+                idx = me._getNextIdx();
                 item = list.eq(idx);
+
+            } else {
+                //通过鼠标方式选中的列表项，要修改当前选中索引
+                idx = list.index(item);
             }
+            me.curIdx = idx;
             var val = item.data('value');
             tgt.val(val);
             me._hide();
@@ -113,31 +119,41 @@ $(function() {
 
         _setCurrentIdx: function(dir) {
             var me = this;
-            var itemList = me.itemList;
-            var listLen = itemList.length;
-            var idx = me.curIdx;
-
-            if (dir > 0) {
-                (++idx > listLen - 1) && (idx = 0);
-            } else if (dir < 0) {
-                (--idx < 0) && (idx = listLen - 1);
-            }
-
-            idx = idx > listLen ? listLen : idx;
+            var idx = me._getNextIdx(dir);
             me.curIdx = idx;
 
-            me._setCurrentStyle();
+            me._setCurrentStyle(idx);
         },
 
-        _setCurrentStyle: function(item) {
+        _getNextIdx: function(dir) {
+            var me = this;
+            var itemList = me.itemList;
+            var listLen = itemList.length;
+            var actClass = me.config.activeClass;
+            var activeIdx = itemList.index(itemList.filter('.' + actClass));
+
+            //如果有上下的方向,那么对应的index就- / + 1;否则返回当前的index;
+            if (dir > 0) {
+                (++activeIdx > listLen - 1) && (activeIdx = 0);
+            } else if (dir < 0) {
+                (--activeIdx < 0) && (activeIdx = listLen - 1);
+            }
+
+            return activeIdx;
+        },
+
+        _setCurrentStyle: function(item) { //参数支持:jquery对象, 数字, 或空(当前的index)
             var me = this;
             var actClass = me.config.activeClass;
-            var idx = me.curIdx;
             var list = me.itemList;
+            var type = me._getObjectType(item);
             list.removeClass(actClass);
-            if (item && item.length > 0) {
+            if (item && item.length > 0 && type === 'object') { //jquery object
                 item.addClass(actClass);
+            } else if (type === 'number') { //number
+                list.eq(item).addClass(actClass);
             } else {
+                var idx = me.curIdx;
                 list.eq(idx).addClass(actClass);
             }
         },
@@ -152,7 +168,9 @@ $(function() {
             }
 
             me._scrollTo(dir);
-            me._setCurrentIdx(dir);
+            //TODO: 使用方向键时，不用更新当前选中元素的索引；只需要更新选中样式即可
+            //me._setCurrentIdx(dir);
+            me._setCurrentStyle(me._getNextIdx(dir));
         },
 
         _show: function() {
@@ -201,6 +219,19 @@ $(function() {
             }
             dom.scrollTop(top);
         },
+
+        _getObjectType: function(obj) {
+            var type = Object.prototype.toString.apply(obj);
+            if (type === '[object Object]') {
+                return 'object';
+            } else if (type === '[object Number]') {
+                return 'number';
+            } else if (type === '[object Array]') {
+                return 'array';
+            } else {
+                return 'object';
+            }
+        }
 
     }
 
