@@ -21,6 +21,9 @@
             background:green;
             border:5px solid rgb(245,161,161);
         }
+        .changeList{
+            cursor: pointer;
+        }
     </style>
     <link rel="stylesheet" type="text/css" href="../dropdownlist.css">
 </head>
@@ -29,13 +32,22 @@
         <div class='content'>
             <input type="text" class="dropdown" autocomplete=off id="dropdown">
         </div>
+        <div class='changeList'>更改列表内容</div>
     </div>
 
     <script type="text/javascript" src="./jquery-2.1.0.min.js"></script>
     <script src="../dropdownlist.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" charset="utf-8">
         $(function(){
-            $('.dropdown').DropDownList(['你是我的小呀小苹果1', '你是我的小呀小苹果2', '你是我的小呀小苹果3', '你是我的小呀小苹果4', '你是我的小呀小苹果5', '你是我的小呀小苹果6', '你是我的小呀小苹果7']);
+                $('.dropdown').DropDownList(['你是我的小呀小苹果1', '你是我的小呀小苹果2', '你是我的小呀小苹果3', '你是我的小呀小苹果4', '你是我的小呀小苹果5', '你是我的小呀小苹果6', '你是我的小呀小苹果7'], {max: 6, onSelected: function(){
+                    console.log(this);
+                    }});
+            $('.changeList').click(function(e){
+                var dropDownList = $('.dropdown').data('DROPDOWNLIST');
+                dropDownList.setList(['无敌的喵星人1','无敌的喵星人2','无敌的喵星人3','无敌的喵星人4']);
+                //dropDownList.setList(['无敌的喵星人1','无敌的喵星人2','无敌的喵星人3','无敌的喵星人4','无敌的喵星人5','无敌的喵星人6','无敌的喵星人7','无敌的喵星人8','无敌的喵星人9']);
+                e.preventDefault();
+            })
         })
     
     </script>

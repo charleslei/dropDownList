@@ -3,10 +3,13 @@ if (typeof QNR == "undefined") {
 }
 
 $(function() {
-    CC = function(data, args) { //i_cls:item class; c_cls: content class; a_cls: active class; callback(function):点击tab切换显示区域之后执行
+    CC = function(data, args) {
         var me = this;
         var config = {
-            activeClass: 'active'
+            activeClass: 'active',
+            max: 5,
+
+            onSelected: function(){}
         }
         me.oriData = data;
         me.config = $.extend(config, args);
@@ -56,8 +59,14 @@ $(function() {
                 me._setSelectedValue($ele);
             }).delegate('.dropdownlist_item', 'mouseover', function(e) {
                 var self = $(e.target);
-                me._setCurrentStyle(self);
+                me._setStyle(self);
             })
+
+
+            //用户注册事件
+            me.dom.bind('selected', function(){
+                me.config.onSelected.apply(me);
+            });
         },
 
         _initHTML: function() {
@@ -80,8 +89,10 @@ $(function() {
             var data = me.oriData;
             var str = '';
             var list = '';
+            var max = me.config.max;
             $.each(data, function(k, v) {
                 str += '<li class="dropdownlist_item" data-value="' + v + '">' + v + '</li>'
+                if (k + 1 >= max) return false;
             });
 
             dom.find('ul').empty().append(str);
@@ -96,6 +107,8 @@ $(function() {
                 top: list.eq(0).offset().top,
                 h: list.eq(0).outerHeight()
             };
+
+            //me._setIdx();
         },
 
         _setSelectedValue: function(item) {
@@ -104,7 +117,7 @@ $(function() {
             var list = me.itemList;
             var idx = '';
             if (!item) {
-                idx = me._getNextIdx();
+                idx = me._getNextIdxByCls();
                 item = list.eq(idx);
 
             } else {
@@ -114,18 +127,20 @@ $(function() {
             me.curIdx = idx;
             var val = item.data('value');
             tgt.val(val);
+
+            me.dom.trigger('selected');
             me._hide();
         },
 
-        _setCurrentIdx: function(dir) {
+        _setIdx: function(dir) {
             var me = this;
-            var idx = me._getNextIdx(dir);
+            var idx = me._getNextIdxByCls(dir);
             me.curIdx = idx;
 
-            me._setCurrentStyle(idx);
+            me._setStyle(idx);
         },
 
-        _getNextIdx: function(dir) {
+        _getNextIdxByCls: function(dir) {
             var me = this;
             var itemList = me.itemList;
             var listLen = itemList.length;
@@ -142,7 +157,16 @@ $(function() {
             return activeIdx;
         },
 
-        _setCurrentStyle: function(item) { //参数支持:jquery对象, 数字, 或空(当前的index)
+        /*当列表项修改时,当前的index会超出列表长度,故在这里判断一下 */
+        _getIdx: function() {
+            var me = this;
+            var idx = me.curIdx;
+            var list = me.itemList;
+            var listLen = me.itemList.length;
+            return (idx > listLen - 1) ? listLen - 1 : idx;
+        },
+
+        _setStyle: function(item) { //参数支持:jquery对象, 数字, 或空(当前的index)
             var me = this;
             var actClass = me.config.activeClass;
             var list = me.itemList;
@@ -153,11 +177,12 @@ $(function() {
             } else if (type === 'number') { //number
                 list.eq(item).addClass(actClass);
             } else {
-                var idx = me.curIdx;
+                var idx = me._getIdx();
                 list.eq(idx).addClass(actClass);
             }
         },
 
+        /*设置下一个高亮的想,此操作不会对curIdx属性直接进行修改,而是间接性的;*/
         _next: function(dir) {
             var me = this;
 
@@ -168,16 +193,14 @@ $(function() {
             }
 
             me._scrollTo(dir);
-            //TODO: 使用方向键时，不用更新当前选中元素的索引；只需要更新选中样式即可
-            //me._setCurrentIdx(dir);
-            me._setCurrentStyle(me._getNextIdx(dir));
+            me._setStyle(me._getNextIdxByCls(dir));
         },
 
         _show: function() {
             var me = this;
 
             if (me.shown) return;
-            me._setCurrentStyle();
+            me._setStyle();
             me.dom.show();
             me.shown = true;
         },
@@ -193,7 +216,7 @@ $(function() {
         _scrollTo: function(val) {
             var me = this;
 
-            var idx = me.curIdx;
+            var idx = me._getIdx();
             var idxDelta;
             var curH = me.curRect.h;
             var curTop = me.curRect.top - idx * curH;
@@ -231,8 +254,16 @@ $(function() {
             } else {
                 return 'object';
             }
-        }
+        },
 
+        /*============================
+         *public function
+         * */
+        setList: function(data) {
+            var me = this;
+            me.oriData = data;
+            me._drawList();
+        }
     }
 
     $.fn.extend({
