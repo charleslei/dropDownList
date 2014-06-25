@@ -6,11 +6,11 @@ $(function() {
     DropDownList = function(data, args) {
         var me = this;
         var config = {
-            activeClass: 'active',
-            max: 5,
+            activeClass: 'active', //列表项选中的样式名称；
+            max: 5,  //列表项的数量；多于此值将不会显示；
 
-            onSelected: function() {},
-            formatItem: function() {}
+            onSelected: function() {}, //点击列表项或者在某个列表项上按下enter时，触发的函数；可以作一些其他的事情；
+            formatItem: function() {}  //初始化列表项时会多次触发该函数，可以设置列表项可以显示的数值；
         }
         me.oriData = data;
         me.config = $.extend(config, args);
@@ -21,6 +21,7 @@ $(function() {
     };
 
     var AA = {
+        /*类型判断函数，不用支持太多，够用就行；*/
         _getObjectType: function(obj) {
             var type = Object.prototype.toString.apply(obj);
             if (type === '[object Object]') {
@@ -34,12 +35,13 @@ $(function() {
             }
         },
 
+        /*初始化函数, 顺序不能变*/
         _init: function(me) {
             DropDownList._initHTML(me);
             DropDownList._drawList(me);
             DropDownList._initEvt(me);
         },
-
+        /*初始化控件的事件*/
         _initEvt: function(me) {
             //单击输入框或者获取焦点时;
             me.config.tgt.bind('click focusin', function(e) {
@@ -81,6 +83,7 @@ $(function() {
             });
         },
 
+        /*初始化控件；*/
         _initHTML: function(me) {
             var tgt = me.config.tgt;
             var _html = '<div class="dropdownlist_ctn"><div class="dropdownlist"><ul></ul></div></div>';
@@ -92,6 +95,7 @@ $(function() {
             prt.append($html);
         },
 
+        /*初始化控件；*/
         _drawList: function(me) {
             var dom = me.dom;
             var data = me.oriData;
@@ -117,7 +121,7 @@ $(function() {
                 h: list.eq(0).outerHeight()
             };
         },
-
+        /*设置选中的值，写入输入框*/
         _setSelectedValue: function(me, item) {
             var tgt = me.config.tgt;
             var list = me.itemList;
@@ -138,14 +142,14 @@ $(function() {
             me.dom.trigger('selected');
             DropDownList._hide(me);
         },
-
+        /*设置当前列表项的选中项index，废弃*/
         _setIdx: function(me, dir) {
             var idx = me._getNextIdxByCls(me, dir);
             me.curIdx = idx;
 
             me._setStyle(me, idx);
         },
-
+        /*根据class名称获取下一个需要高亮的项的索引*/
         _getNextIdxByCls: function(me, dir) {
             var itemList = me.itemList;
             var listLen = itemList.length;
@@ -169,8 +173,8 @@ $(function() {
             var listLen = me.itemList.length;
             return (idx > listLen - 1) ? listLen - 1 : idx;
         },
-
-        _setStyle: function(me, item) { //参数支持:jquery对象, 数字, 或空(当前的index)
+        /*设置选中项的样式，参数支持jquery对象， 数字，或空(当前的index)*/
+        _setStyle: function(me, item) {
             var actClass = me.config.activeClass;
             var list = me.itemList;
             var type = DropDownList._getObjectType(item);
@@ -196,14 +200,14 @@ $(function() {
             DropDownList._scrollTo(me, dir);
             DropDownList._setStyle(me, DropDownList._getNextIdxByCls(me, dir));
         },
-
+        /*显示列表项*/
         _show: function(me) {
             if (me.shown) return;
             DropDownList._setStyle(me);
             me.dom.show();
             me.shown = true;
         },
-
+        /*隐藏列表项*/
         _hide: function(me) {
             me.itemList.removeClass(me.config.activeClass);
             me.dom.hide();

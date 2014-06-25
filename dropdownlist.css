@@ -1,5 +1,5 @@
 .dropdownlist_ctn{position: relative;z-index:10;}
-.dropdownlist{position: absolute; background: #EEE; display: none;z-index:11;border:1px solid #b7b7b7;top:0;*top:-1px;}
-.dropdownlist ul{list-style: none;margin:0;padding:0}
+.dropdownlist{position: absolute; background: #EEE; display: none;z-index:11;border:1px solid #b7b7b7;top:0;*top:-1px;height:150px;overflow-x:hidden;overflow-y:auto;}
+.dropdownlist ul{list-style: none;margin:0;padding:0;}
 .dropdownlist .dropdownlist_item{line-height: 30px; height: 30px; overflow: hidden; cursor: pointer;padding: 0 5px;}
 .dropdownlist .dropdownlist_item.active{background-color:#4778da;color:#fff;}
