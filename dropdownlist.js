@@ -9,7 +9,8 @@ $(function() {
             activeClass: 'active',
             max: 5,
 
-            onSelected: function() {}
+            onSelected: function() {},
+            formatItem: function() {}
         }
         me.oriData = data;
         me.config = $.extend(config, args);
@@ -98,7 +99,8 @@ $(function() {
             var list = '';
             var max = me.config.max;
             $.each(data, function(k, v) {
-                str += '<li class="dropdownlist_item" data-value="' + v + '">' + v + '</li>'
+                var fmtV = DropDownList._formatItem(me, v);
+                str += '<li class="dropdownlist_item" data-idx="' + k + '">' + fmtV + '</li>'
                 if (k + 1 >= max) return false;
             });
 
@@ -119,6 +121,7 @@ $(function() {
         _setSelectedValue: function(me, item) {
             var tgt = me.config.tgt;
             var list = me.itemList;
+            var data = me.oriData;
             var idx = '';
             if (!item) {
                 idx = DropDownList._getNextIdxByCls(me);
@@ -129,7 +132,7 @@ $(function() {
                 idx = list.index(item);
             }
             me.curIdx = idx;
-            var val = item.data('value');
+            var val = data[item.data('idx')];
             tgt.val(val);
 
             me.dom.trigger('selected');
@@ -234,6 +237,10 @@ $(function() {
                 }
             }
             dom.scrollTop(top);
+        },
+
+        _formatItem: function(me, val) {
+            return me.config.formatItem.call(me, val);
         }
     };
 
