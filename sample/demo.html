@@ -30,10 +30,14 @@
 <body>
     <div class="prt">
         <div class='content'>
-            <input type="text" class="dropdown" autocomplete=off id="dropdown">
+            <div>
+                <input type="text" class="dropdown" autocomplete=off id="dropdown">
+            </div>
         </div>
         <div class='content'>
-            <input type="text" class="dropdown" autocomplete=off id="dropdown">
+            <div>
+                <input type="text" class="dropdown" autocomplete=off id="dropdown">
+            </div>
         </div>
         <div class='changeList'>更改列表内容</div>
     </div>
@@ -43,7 +47,6 @@
     <script type="text/javascript" charset="utf-8">
         $(function(){
                 $('.dropdown').DropDownList(['你是我的小呀小苹果1', '你是我的小呀小苹果2', '你是我的小呀小苹果3', '你是我的小呀小苹果4', '你是我的小呀小苹果5', '你是我的小呀小苹果6', '你是我的小呀小苹果7'], {max: 6, onSelected: function(){
-                    console.log(this);
                     }});
             $('.changeList').click(function(e){
                 var dropDownList = $('#dropdown').data('DROPDOWNLIST');

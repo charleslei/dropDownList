@@ -82,15 +82,13 @@ $(function() {
 
         _initHTML: function(me) {
             var tgt = me.config.tgt;
-            var _html = '<div class="dropdownlist"><ul></ul></div>';
+            var _html = '<div class="dropdownlist_ctn"><div class="dropdownlist"><ul></ul></div></div>';
 
-            var wd = tgt.outerWidth();
-            me.dom = $(_html).css('width', wd);
+            var wd = parseInt(tgt.outerWidth()) - 2 + 'px';
+            var $html = $(_html);
+            me.dom = $html.find('.dropdownlist').css('width', wd);
             var prt = me.config.tgt.parent();
-            prt.css({
-                "position": "relative"
-            });
-            prt.append(me.dom);
+            prt.append($html);
         },
 
         _drawList: function(me) {
