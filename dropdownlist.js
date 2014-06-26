@@ -215,8 +215,8 @@ $(function() {
         },
 
         /*当下拉列表出现滚动条时,该方法可以实现同一方向上的循环滚动;*/
-        _scrollTo: function(me, val) {
-            var idx = DropDownList._getIdx(me);
+        _scrollTo: function(me, dir) {
+            var idx = DropDownList._getNextIdxByCls(me, dir);
             var idxDelta;
             var curH = me.curRect.h;
             var curTop = me.curRect.top - idx * curH;
@@ -227,7 +227,7 @@ $(function() {
             var delta, top;
             var dom = me.dom;
             var scrollTop = dom.scrollTop();
-            if (val > 0) {
+            if (dir > 0) {
                 if ((delta = (idx + 1) * curH - scrollTop - prtH) > 0) {
                     top = scrollTop + delta + 2; //dom的border是2px
                 } else if ((delta = (idx + 1) * curH - scrollTop) < 0) {
